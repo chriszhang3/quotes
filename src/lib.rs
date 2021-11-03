@@ -74,7 +74,7 @@ impl Quote {
 
     // Take a file and convert it to a vector of quotes.
     // TODO: take argument as number of spaces between lines.
-    pub fn parse_file(contents: &str, single_line_break: bool) -> Vec<Quote> {
+    pub fn parse_file(contents: &str, single_line_breaks: bool) -> Vec<Quote> {
 
         // Data structures to be output.
         let mut quotes_vec = Vec::new();
@@ -92,8 +92,13 @@ impl Quote {
 
             } else {
 
+                if single_line_breaks {
+                    line_number_option = Some(line_number);
+                    quote_text.push_str(line);
+                }
+
                 // If there are two blank lines in a row, create a new quote.
-                if previous_line_empty || single_line_break{
+                if previous_line_empty || single_line_breaks {
                     if let Some(first_line_number) = line_number_option {
                         let quote = Quote::new(&quote_text, 1+first_line_number);
                         quotes_vec.push(quote);
@@ -103,12 +108,14 @@ impl Quote {
                     }
                 }
 
-                // If this is the start of a new quote, set the line_number_option.
-                if line_number_option == None {
+                if !single_line_breaks {
+                    // If this is the start of a new quote, set the line_number_option.
+                    if line_number_option == None {
                         line_number_option = Some(line_number);
+                    }
+                    quote_text.push_str(line);
+                    quote_text.push_str(";;"); // Delimiter between different lines in the quote.
                 }
-                quote_text.push_str(line);
-                quote_text.push_str(";;"); // Delimiter between different lines in the quote.
             }
         }
 
@@ -117,7 +124,6 @@ impl Quote {
             let quote = Quote::new(&quote_text, 1+first_line_number);
             quotes_vec.push(quote);
         }
-
         quotes_vec
     }
 

@@ -26,6 +26,10 @@ struct Opt {
     #[structopt(short, long)]
     line_number: bool,
 
+    /// Input file has single line breaks.
+    #[structopt(long = "slb")]
+    single_line_breaks: bool,
+
     /// Filter quotes by author.
     /// 
     /// Case insensitive. Matches an author that contains the search term.
@@ -43,7 +47,7 @@ struct Opt {
 fn main() {
     let opt = Opt::from_args();
     let contents = fs::read_to_string(&opt.input).expect(&format!("Could not find file {}.", opt.input));
-    let mut quote_list = Quote::parse_file(&contents, false);
+    let mut quote_list = Quote::parse_file(&contents, opt.single_line_breaks);
     
     // Filter quote text.
     if let Some(query) = opt.search {
